@@ -1,0 +1,26 @@
+{
+    "name": "unopim/bagisto-rest-api",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Webkul",
+            "email": "support@webkul.com"
+        }
+    ],
+    "require": {
+        "darkaonline/l5-swagger": "^8.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkul\\RestApi\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkul\\RestApi\\Providers\\RestApiServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev"
+}
