@@ -41,7 +41,7 @@ return [
                  * Absolute paths to directory containing the swagger annotations are stored.
                 */
                 'annotations' => [
-                    base_path('vendor/bagisto/rest-api/src/Docs/Shop'),
+                    base_path('vendor/unopim/bagisto-rest-api/src/Docs/Shop'),
                 ],
 
             ],
@@ -84,7 +84,7 @@ return [
                  * Absolute paths to directory containing the swagger annotations are stored.
                 */
                 'annotations' => [
-                    base_path('vendor/bagisto/rest-api/src/Docs/Admin'),
+                    base_path('vendor/unopim/bagisto-rest-api/src/Docs/Admin'),
                 ],
 
             ],
