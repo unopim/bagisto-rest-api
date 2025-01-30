@@ -11,6 +11,7 @@ use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Webkul\DataTransfer\Helpers\Importers\Product\Importer as BaseImporter;
+use Illuminate\Support\Facades\Config;
 
 class Importer extends BaseImporter
 {
@@ -98,7 +99,7 @@ class Importer extends BaseImporter
         }
 
         $this->saveProducts($products);
-        
+
         $this->saveChannels($channels);
 
         $this->saveCustomerGroupPrices($customerGroupPrices);
@@ -143,18 +144,32 @@ class Importer extends BaseImporter
         $imagesData[$rowData['sku']] = [];
 
         $imageNames = array_map('trim', explode(',', $rowData['images']));
+        $disks = Config::get('filesystems.disks');
 
         foreach ($imageNames as $key => $image) {
             if (filter_var($image, FILTER_VALIDATE_URL)) {
-                $imagePath = 'product'.DIRECTORY_SEPARATOR.$rowData['sku'];
+                if (array_key_exists('s3', $disks) && $disks['s3']['key'] !== null) {
+                    $parsedUrl = parse_url($image, PHP_URL_PATH);
+                    $parsedUrl = ltrim($parsedUrl, '/');
 
-                if ($uploadedPath = $this->saveImageFromUrl($image, $imagePath)) {
-                    $imagesData[$rowData['sku']][] = [
-                        'name' => $uploadedPath,
-                        'path' => Storage::path($uploadedPath),
-                    ];
-                    continue;
+                    if (Storage::disk('s3')->has($parsedUrl)) {
+                        $imagesData[$rowData['sku']][] = [
+                            'name' => $parsedUrl,
+                            'path' => Storage::disk('s3')->path($parsedUrl),
+                        ];
+                        continue;
+                    }
+		        } else {
+                    $imagePath = 'product'.DIRECTORY_SEPARATOR.$rowData['sku'];
+                    if ($uploadedPath = $this->saveImageFromUrl($image, $imagePath)) {
+                        $imagesData[$rowData['sku']][] = [
+                            'name' => $uploadedPath,
+                            'path' => Storage::path($uploadedPath),
+                        ];
+                        continue;
+                    }
                 }
+
             }
             if (! Storage::has($image)) {
                 continue;
@@ -175,13 +190,23 @@ class Importer extends BaseImporter
         if (empty($imagesData)) {
             return;
         }
-
+        $disks = Config::get('filesystems.disks');
         $productImages = [];
         foreach ($imagesData as $sku => $images) {
             $product = $this->skuStorage->get($sku);
 
             foreach ($images as $key => $image) {
-                if (Storage::has($image['name'])) {
+
+                if (array_key_exists('s3', $disks) && $disks['s3']['key'] !== null) {
+                    if (Storage::disk('s3')->has($image['name'])) {
+                        $productImages[] = [
+                            'type'       => 'images',
+                            'path'       => $image['name'],
+                            'product_id' => $product['id'],
+                            'position'   => $key + 1,
+                        ];
+                    }
+		        } else if (Storage::has($image['name'])) {
                     $productImages[] = [
                         'type'       => 'images',
                         'path'       => $image['name'],
@@ -190,20 +215,20 @@ class Importer extends BaseImporter
                     ];
                 } else {
                     $file = new UploadedFile($image['path'], $image['name']);
-    
+
                     $image = (new ImageManager)->make($file)->encode('webp');
-    
+
                     $imageDirectory = $this->productImageRepository->getProductDirectory((object) $product);
-    
+
                     $path = $imageDirectory.'/'.Str::random(40).'.webp';
-    
+
                     $productImages[] = [
                         'type'       => 'images',
                         'path'       => $path,
                         'product_id' => $product['id'],
                         'position'   => $key + 1,
                     ];
-    
+
                     Storage::put($path, $image);
                 }
             }
@@ -229,7 +254,7 @@ class Importer extends BaseImporter
 
             return null;
         }
-    
+
         $image = (new ImageManager)->make(file_get_contents($tempFilePath))->encode('webp');
 
         $path = $path.'/'.Str::random(40).'.webp';
@@ -237,7 +262,7 @@ class Importer extends BaseImporter
         try {
             if (Storage::put($path, $image)) {
                 return  $path;
-            } 
+            }
 
             Log::error("Failed to store image from URL: $url to path: $path. Error: ");
 
