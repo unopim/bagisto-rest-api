@@ -13,6 +13,10 @@ class ProcessProductBatch implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 5;
+
+    public $timeout = 300000;
+
     protected $batch;
 
     /**

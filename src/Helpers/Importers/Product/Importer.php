@@ -99,7 +99,7 @@ class Importer extends BaseImporter
         }
 
         $this->saveProducts($products);
-
+        
         $this->saveChannels($channels);
 
         $this->saveCustomerGroupPrices($customerGroupPrices);
@@ -215,20 +215,20 @@ class Importer extends BaseImporter
                     ];
                 } else {
                     $file = new UploadedFile($image['path'], $image['name']);
-
+    
                     $image = (new ImageManager)->make($file)->encode('webp');
-
+    
                     $imageDirectory = $this->productImageRepository->getProductDirectory((object) $product);
-
+    
                     $path = $imageDirectory.'/'.Str::random(40).'.webp';
-
+    
                     $productImages[] = [
                         'type'       => 'images',
                         'path'       => $path,
                         'product_id' => $product['id'],
                         'position'   => $key + 1,
                     ];
-
+    
                     Storage::put($path, $image);
                 }
             }
@@ -254,7 +254,7 @@ class Importer extends BaseImporter
 
             return null;
         }
-
+    
         $image = (new ImageManager)->make(file_get_contents($tempFilePath))->encode('webp');
 
         $path = $path.'/'.Str::random(40).'.webp';
@@ -262,7 +262,7 @@ class Importer extends BaseImporter
         try {
             if (Storage::put($path, $image)) {
                 return  $path;
-            }
+            } 
 
             Log::error("Failed to store image from URL: $url to path: $path. Error: ");
 
@@ -272,6 +272,40 @@ class Importer extends BaseImporter
 
             return null;
         }
+    }
+
+    public function prepareCategories(array $rowData, array &$categories): void
+    {
+        if (empty($rowData['categories'])) {
+            return;
+        }
+
+        /**
+         * Reset the sku categories data to prevent
+         * data duplication in case of multiple locales
+         */
+        $categories[$rowData['sku']] = [];
+
+        $rowCategoriesIds = explode('/', $rowData['categories'] ?? '');
+
+        $categoryIds = [];
+
+        foreach ($rowCategoriesIds as $rowCategoryId) {
+            if (isset($this->categories[$rowCategoryId])) {
+                $categoryIds = array_merge($categoryIds, $this->categories[$rowCategoryId]);
+
+                continue;
+            }
+
+            $this->categories[$rowCategoryId] = $this->categoryRepository
+                ->where('id', $rowCategoryId)
+                ->pluck('id')
+             	->toArray();
+
+            $categoryIds = array_merge($categoryIds, $this->categories[$rowCategoryId]);
+        }
+
+        $categories[$rowData['sku']] = $categoryIds;
     }
 
     /**
@@ -295,7 +329,7 @@ class Importer extends BaseImporter
 
         $inventorySources = explode(',', $rowData['inventories'] ?? '');
 
-        foreach ($inventorySources as $inventorySource) {
+	foreach ($inventorySources as $inventorySource) {
             [$inventorySource, $qty] = explode('=', $inventorySource ?? '');
 
             $inventories[$rowData['sku']][] = [
