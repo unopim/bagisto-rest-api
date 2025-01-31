@@ -129,6 +129,45 @@ class AttributeController
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/v1/admin/catalog/attributes/code/{code}",
+     *      operationId="getAttributeByCode",
+     *      tags={"Attributes"},
+     *      summary="Get admin attribute detail",
+     *      description="Returns attribute detail",
+     *      security={ {"sanctum_admin": {} }},
+     *
+     *      @OA\Parameter(
+     *          name="code",
+     *          description="Attribute Code",
+     *          required=true,
+     *          in="path",
+     *
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="object",
+     *                  ref="#/components/schemas/Attribute"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function getByCode()
+    {
+    }
+
+    /**
      * @OA\Post(
      *      path="/api/v1/admin/catalog/attributes",
      *      operationId="storeAttribute",

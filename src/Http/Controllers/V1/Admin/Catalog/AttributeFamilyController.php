@@ -26,6 +26,16 @@ class AttributeFamilyController extends CatalogController
     }
 
     /**
+     * Resource class name.
+     */
+    public function getResourceByCode(string $code)
+    {
+        return response([
+            'data' => new AttributeFamilyResource($this->getRepositoryInstance()->findOneByField('code', $code))
+        ]);
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @return \Illuminate\Http\Response

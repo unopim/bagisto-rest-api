@@ -27,6 +27,16 @@ class AttributeController extends CatalogController
     }
 
     /**
+     * getResourceByCode .
+     */
+    public function getResourceByCode(string $code)
+    {
+        return response([
+            'data' => new AttributeResource($this->getRepositoryInstance()->with('options')->findOneByField('code', $code))
+        ]);
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @return \Illuminate\Http\Response
