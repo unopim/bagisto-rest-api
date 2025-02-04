@@ -36,5 +36,6 @@ class ProcessProductBatch implements ShouldQueue
     {
         $importer = app(Importer::class);
         $importer->saveProductsData($this->batch);
+        $importer->indexBatch($this->batch);
     }
 }
