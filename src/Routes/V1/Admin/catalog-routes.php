@@ -66,6 +66,8 @@ Route::group([
 
         Route::post('', 'store');
 
+        Route::get('code/{code}', 'getResourceByCode');
+
         Route::get('{id}', 'getResource');
 
         Route::put('{id}', 'update');
@@ -84,6 +86,8 @@ Route::group([
         Route::post('', 'store');
 
         Route::get('{id}', 'getResource');
+
+        Route::get('code/{code}', 'getResourceByCode');
 
         Route::put('{id}', 'update');
 

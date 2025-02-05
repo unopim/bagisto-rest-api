@@ -129,6 +129,45 @@ class AttributeFamilyController
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/v1/admin/catalog/attribute-families/code/{code}",
+     *      operationId="getAttributeFamilyByCode",
+     *      tags={"Attribute-Families"},
+     *      summary="Get admin attribute family detail",
+     *      description="Returns attribute family detail",
+     *      security={ {"sanctum_admin": {} }},
+     *
+     *      @OA\Parameter(
+     *          name="code",
+     *          description="Attribute Family Code",
+     *          required=true,
+     *          in="path",
+     *
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(
+     *                  property="data",
+     *                  type="object",
+     *                  ref="#/components/schemas/AttributeFamily"
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function getByCode()
+    {
+    }
+
+    /**
      * @OA\Post(
      *      path="/api/v1/admin/catalog/attribute-families",
      *      operationId="storeAttributeFamily",

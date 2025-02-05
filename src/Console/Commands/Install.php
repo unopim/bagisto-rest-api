@@ -26,6 +26,12 @@ class Install extends Command
     public function handle()
     {
         $this->warn('Step: Publishing L5Swagger Provider File...');
+
+        $configFilePath = config_path('l5-swagger.php');
+        if (file_exists($configFilePath)) {
+            $this->warn('File [config/l5-swagger.php] already exists. Deleting the old file...');
+            unlink($configFilePath); // Delete the existing file
+        }
         $result = shell_exec('php artisan vendor:publish --tag=bagisto-rest-api-swagger');
         $this->info($result);
 
