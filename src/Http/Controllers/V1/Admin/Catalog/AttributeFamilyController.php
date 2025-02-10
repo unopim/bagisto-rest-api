@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Webkul\Attribute\Repositories\AttributeFamilyRepository;
 use Webkul\Core\Rules\Code;
 use Webkul\RestApi\Http\Resources\V1\Admin\Catalog\AttributeFamilyResource;
+use Webkul\RestApi\Http\Resources\V1\Admin\Catalog\AttributeFamilyPayloadResource;
 
 class AttributeFamilyController extends CatalogController
 {
@@ -31,7 +32,7 @@ class AttributeFamilyController extends CatalogController
     public function getResourceByCode(string $code)
     {
         return response([
-            'data' => new AttributeFamilyResource($this->getRepositoryInstance()->findOneByField('code', $code))
+            'data' => new AttributeFamilyPayloadResource($this->getRepositoryInstance()->findOneByField('code', $code)),
         ]);
     }
 
@@ -51,6 +52,8 @@ class AttributeFamilyController extends CatalogController
         ]);
 
         Event::dispatch('catalog.attribute_family.create.before');
+
+        $this->normalizeDefaultFamily(request('code'));
 
         $attributeFamily = $this->getRepositoryInstance()->create([
             'attribute_groups'=> request('attribute_groups'),
@@ -90,6 +93,8 @@ class AttributeFamilyController extends CatalogController
                 'message' => trans('rest-api::app.admin.catalog.families.error.can-not-updated'),
             ], 400);
         }
+
+        $this->normalizeDefaultFamily(request('code'));
 
         $attributeFamily = $this->getRepositoryInstance()->update(request()->only([
             'attribute_groups',
@@ -135,5 +140,99 @@ class AttributeFamilyController extends CatalogController
         return response([
             'message' => trans('rest-api::app.admin.catalog.families.delete-success'),
         ]);
+    }
+
+    protected function normalizeDefaultFamily($code)
+    {
+        $attributeFamily = $this->getRepositoryInstance()->findOneByField('code', $code);
+        if ($attributeFamily) {
+            $response = $this->getResourceByCode($code);
+        } else {
+            $response = $this->getResourceByCode('default');
+        }
+        $defaultFamily = json_decode($response->getContent(), true)['data'];
+        $defaultFamily['attribute_groups'] = $this->convertToPayload($defaultFamily['attribute_groups']);
+        $this->updateBagistoFamilyPayload($defaultFamily, request()->all());
+        $request = request();
+        $request->merge($defaultFamily);
+    }
+
+    protected function mergeAttributeFamilies(array $baseArray, array $mergeArray): array
+    {
+        $attributeGroups = [];
+
+        foreach ($mergeArray['attribute_groups'] as $group) {
+            $attributeGroups[$group['code']] = $group;
+        }
+
+        foreach ($baseArray['attribute_groups'] as $groupKey => $group) {
+            $code = $group['code'];
+
+            if (isset($attributeGroups[$code])) {
+                $existingAttributes = array_column($attributeGroups[$code]['custom_attributes'], null, 'id');
+
+                foreach ($group['custom_attributes'] as $attribute) {
+                    $existingAttributes[$attribute['id']] = $attribute;
+                }
+
+                $attributeGroups[$code]['custom_attributes'] = array_values($existingAttributes);
+            } else {
+                $attributeGroups[$code] = $group;
+            }
+        }
+
+        return [
+            'code'             => $mergeArray['code'],
+            'name'             => $mergeArray['name'],
+            'id'               => $mergeArray['id'],
+            'attribute_groups' => array_values($attributeGroups), // Reindex groups
+        ];
+    }
+
+    protected function updateBagistoFamilyPayload(&$defaultFamily, $unopimFamily)
+    {
+        $defaultFamily['code'] = $unopimFamily['code'];
+        $defaultFamily['name'] = $unopimFamily['name'];
+        unset($defaultFamily['id']);
+        foreach ($unopimFamily['attribute_groups'] as $groupId => $group) {
+            $existingGroupKey = null;
+            foreach ($defaultFamily['attribute_groups'] as $key => $existingGroup) {
+                if ($existingGroup['code'] === $group['code']) {
+                    $existingGroupKey = $key;
+                    break;
+                }
+            }
+
+            if ($existingGroupKey === null) {
+                $defaultFamily['attribute_groups'][$groupId] = $group;
+            } else {
+                foreach ($group['custom_attributes'] as $newAttribute) {
+                    $exists = false;
+                    foreach ($defaultFamily['attribute_groups'][$existingGroupKey]['custom_attributes'] as $existingAttribute) {
+                        if ($existingAttribute['code'] === $newAttribute['code']) {
+                            $exists = true;
+                            break;
+                        }
+                    }
+
+                    if (! $exists) {
+                        $defaultFamily['attribute_groups'][$existingGroupKey]['custom_attributes'][] = $newAttribute;
+                    }
+                }
+            }
+        }
+    }
+
+    public function convertToPayload($attributeGroups)
+    {
+        $transformedArray = [];
+
+        foreach ($attributeGroups as $group) {
+            $id = $group['id'];
+            unset($group['id']);
+            $transformedArray[$id] = $group;
+        }
+
+        return $transformedArray;
     }
 }
