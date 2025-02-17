@@ -10,6 +10,8 @@ use Webkul\RestApi\Http\Resources\V1\Admin\Catalog\AttributeFamilyPayloadResourc
 
 class AttributeFamilyController extends CatalogController
 {
+    const DEFAULT_FAMILY_CODE = 'default';
+
     /**
      * Repository class name.
      */
@@ -44,21 +46,22 @@ class AttributeFamilyController extends CatalogController
     public function store()
     {
         $this->validate(request(), [
-            'code'                      => ['required', 'unique:attribute_families,code', new Code],
-            'name'                      => 'required',
-            'attribute_groups.*.code'   => 'required',
-            'attribute_groups.*.name'   => 'required',
-            'attribute_groups.*.column' => 'required|in:1,2',
+            'code'                                        => ['required', 'unique:attribute_families,code', new Code],
+            'name'                                        => 'required',
+            'attribute_groups.*.code'                     => 'required',
+            'attribute_groups.*.name'                     => 'required',
+            'attribute_groups.*.column'                   => 'required|in:1,2',
+            'attribute_groups.*.custom_attributes.*.code' => 'required',
         ]);
 
         Event::dispatch('catalog.attribute_family.create.before');
 
-        $this->normalizeDefaultFamily(request('code'));
+        $this->mergeRequestWithDefaultFamily(request('code'));
 
         $attributeFamily = $this->getRepositoryInstance()->create([
-            'attribute_groups'=> request('attribute_groups'),
-            'code'            => request('code'),
-            'name'            => request('name'),
+            'attribute_groups' => request('attribute_groups'),
+            'code'             => request('code'),
+            'name'             => request('name'),
         ]);
 
         Event::dispatch('catalog.attribute_family.create.after', $attributeFamily);
@@ -77,11 +80,12 @@ class AttributeFamilyController extends CatalogController
     public function update(int $id)
     {
         $this->validate(request(), [
-            'code'                      => ['required', 'unique:attribute_families,code,'.$id, new Code],
-            'name'                      => 'required',
-            'attribute_groups.*.code'   => 'required',
-            'attribute_groups.*.name'   => 'required',
-            'attribute_groups.*.column' => 'required|in:1,2',
+            'code'                                        => ['required', 'unique:attribute_families,code,'.$id, new Code],
+            'name'                                        => 'required',
+            'attribute_groups.*.code'                     => 'required',
+            'attribute_groups.*.name'                     => 'required',
+            'attribute_groups.*.column'                   => 'required|in:1,2',
+            'attribute_groups.*.custom_attributes.*.code' => 'required',
         ]);
 
         Event::dispatch('catalog.attribute_family.update.before', $id);
@@ -94,7 +98,7 @@ class AttributeFamilyController extends CatalogController
             ], 400);
         }
 
-        $this->normalizeDefaultFamily(request('code'));
+        $this->mergeRequestWithDefaultFamily(request('code'));
 
         $attributeFamily = $this->getRepositoryInstance()->update(request()->only([
             'attribute_groups',
@@ -142,21 +146,49 @@ class AttributeFamilyController extends CatalogController
         ]);
     }
 
-    protected function normalizeDefaultFamily($code)
+    /**
+     * Merges the current request data with the default family attributes.
+     *
+     * @param string $code The code used to retrieve the default family attributes.
+     * @return void
+     */
+    protected function mergeRequestWithDefaultFamily(string $code): void
     {
-        $attributeFamily = $this->getRepositoryInstance()->findOneByField('code', $code);
-        if ($attributeFamily) {
-            $response = $this->getResourceByCode($code);
-        } else {
-            $response = $this->getResourceByCode('default');
-        }
-        $defaultFamily = json_decode($response->getContent(), true)['data'];
-        $defaultFamily['attribute_groups'] = $this->convertToPayload($defaultFamily['attribute_groups']);
+        $defaultFamily = $this->normalizeDefaultFamily($code);
         $this->updateBagistoFamilyPayload($defaultFamily, request()->all());
         $request = request();
         $request->merge($defaultFamily);
     }
 
+    /**
+     * Normalize default family data.
+     *
+     * @param string  $code  The code of the attribute family.
+     * @return array
+     */
+    protected function normalizeDefaultFamily(string $code): array
+    {
+        $attributeFamily = $this->getRepositoryInstance()->findOneByField('code', $code);
+        $response = $attributeFamily ? $this->getResourceByCode($code) : $this->getResourceByCode(self::DEFAULT_FAMILY_CODE);
+
+        $defaultFamily = [];
+        if (! empty($response->getContent())) {
+            $defaultFamily = json_decode($response->getContent(), true)['data'];
+            $defaultFamily['attribute_groups'] = $this->convertToPayload($defaultFamily['attribute_groups']);
+
+            return $defaultFamily;
+        }
+
+        return $defaultFamily;
+    }
+
+    /**
+     * Merge the attribute families by combining the base array with the merge array.
+     *
+     * @param  array  $baseArray  The base attribute family array.
+     * @param  array  $mergeArray  The attribute family array to merge into the base array.
+     * @return array The merged attribute family array.
+     */
     protected function mergeAttributeFamilies(array $baseArray, array $mergeArray): array
     {
         $attributeGroups = [];
@@ -185,12 +217,21 @@ class AttributeFamilyController extends CatalogController
             'code'             => $mergeArray['code'],
             'name'             => $mergeArray['name'],
             'id'               => $mergeArray['id'],
-            'attribute_groups' => array_values($attributeGroups), // Reindex groups
+            'attribute_groups' => array_values($attributeGroups),
         ];
     }
 
-    protected function updateBagistoFamilyPayload(&$defaultFamily, $unopimFamily)
+    /**
+     * Update the default attribute family payload with the provided family data.
+     *
+     * @param  array  $defaultFamily  The default attribute family data to be updated.
+     * @param  array  $unopimFamily  The new attribute family data to merge into the default family.
+     */
+    protected function updateBagistoFamilyPayload(array &$defaultFamily, array $unopimFamily): void
     {
+        if ($defaultFamily) {
+            return;
+        }
         $defaultFamily['code'] = $unopimFamily['code'];
         $defaultFamily['name'] = $unopimFamily['name'];
         unset($defaultFamily['id']);
@@ -223,7 +264,10 @@ class AttributeFamilyController extends CatalogController
         }
     }
 
-    public function convertToPayload($attributeGroups)
+    /**
+     * Convert attribute groups to payload format.
+     */
+    public function convertToPayload(array $attributeGroups): array
     {
         $transformedArray = [];
 
