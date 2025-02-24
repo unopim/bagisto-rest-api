@@ -229,7 +229,7 @@ class AttributeFamilyController extends CatalogController
      */
     protected function updateBagistoFamilyPayload(array &$defaultFamily, array $unopimFamily): void
     {
-        if ($defaultFamily) {
+        if (! $defaultFamily) {
             return;
         }
         $defaultFamily['code'] = $unopimFamily['code'];
