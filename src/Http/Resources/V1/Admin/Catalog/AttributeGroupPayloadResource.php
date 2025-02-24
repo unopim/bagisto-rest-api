@@ -1,6 +1,6 @@
 <?php
 
-namespace Webkul\BagistoRestApi\Http\Resources\V1\Admin\Catalog;
+namespace Webkul\RestApi\Http\Resources\V1\Admin\Catalog;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
