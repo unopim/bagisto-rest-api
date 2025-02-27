@@ -348,6 +348,27 @@ class Importer extends BaseImporter
     }
 
     /**
+     * Prepare configurable variants
+     */
+    public function prepareConfigurableVariants(array $rowData, array &$configurableVariants): void
+    {
+        if (
+            $rowData['type'] != self::PRODUCT_TYPE_CONFIGURABLE
+            || empty($rowData['configurable_variants'])
+        ) {
+            return;
+        }
+
+        $variants = explode('|', $rowData['configurable_variants']);
+
+        foreach ($variants as $variant) {
+            parse_str(str_replace(',', '&', $variant), $variantAttributes);
+
+            $configurableVariants[$rowData['sku']][$variantAttributes['sku']] = Arr::except($variantAttributes, 'sku');
+        }
+    }
+
+    /**
      * Start the products indexing process
      */
     public function indexBatch($data): bool
