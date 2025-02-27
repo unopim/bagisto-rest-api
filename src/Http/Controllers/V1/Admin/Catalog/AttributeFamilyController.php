@@ -5,8 +5,8 @@ namespace Webkul\RestApi\Http\Controllers\V1\Admin\Catalog;
 use Illuminate\Support\Facades\Event;
 use Webkul\Attribute\Repositories\AttributeFamilyRepository;
 use Webkul\Core\Rules\Code;
-use Webkul\RestApi\Http\Resources\V1\Admin\Catalog\AttributeFamilyResource;
 use Webkul\RestApi\Http\Resources\V1\Admin\Catalog\AttributeFamilyPayloadResource;
+use Webkul\RestApi\Http\Resources\V1\Admin\Catalog\AttributeFamilyResource;
 
 class AttributeFamilyController extends CatalogController
 {
@@ -149,8 +149,7 @@ class AttributeFamilyController extends CatalogController
     /**
      * Merges the current request data with the default family attributes.
      *
-     * @param string $code The code used to retrieve the default family attributes.
-     * @return void
+     * @param  string  $code  The code used to retrieve the default family attributes.
      */
     protected function mergeRequestWithDefaultFamily(string $code): void
     {
@@ -163,8 +162,7 @@ class AttributeFamilyController extends CatalogController
     /**
      * Normalize default family data.
      *
-     * @param string  $code  The code of the attribute family.
-     * @return array
+     * @param  string  $code  The code of the attribute family.
      */
     protected function normalizeDefaultFamily(string $code): array
     {

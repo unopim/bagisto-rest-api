@@ -46,9 +46,7 @@ class ConfigController
      *      )
      * )
      */
-    public function getCoreConfigs()
-    {
-    }
+    public function getCoreConfigs() {}
 
     /**
      * @OA\Get(
@@ -135,9 +133,7 @@ class ConfigController
      *      )
      * )
      */
-    public function list()
-    {
-    }
+    public function list() {}
 
     /**
      * @OA\Get(
@@ -178,7 +174,5 @@ class ConfigController
      *      )
      * )
      */
-    public function get()
-    {
-    }
+    public function get() {}
 }

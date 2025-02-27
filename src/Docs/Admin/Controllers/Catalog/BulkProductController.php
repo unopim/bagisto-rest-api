@@ -14,12 +14,16 @@ class BulkProductController
      *      security={ {"sanctum_admin": {} }},
      *
      *      @OA\RequestBody(
+     *
      *          @OA\MediaType(
      *              mediaType="application/json",
+     *
      *              @OA\Schema(
      *                  type="array",
+     *
      *                  @OA\Items(
      *                      type="object",
+     *
      *                      @OA\Property(
      *                          property="sku",
      *                          description="Unique identifier for the product",
@@ -257,10 +261,13 @@ class BulkProductController
      *              )
      *          )
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
+     *
      *          @OA\JsonContent(
+     *
      *              @OA\Property(
      *                  property="message",
      *                  type="string",
@@ -268,14 +275,12 @@ class BulkProductController
      *              )
      *          )
      *      ),
+     *
      *      @OA\Response(
      *          response=401,
      *          description="Unauthenticated"
      *      )
      * )
      */
-
-    public function store()
-    {
-    }
+    public function store() {}
 }

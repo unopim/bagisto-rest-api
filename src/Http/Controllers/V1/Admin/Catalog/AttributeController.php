@@ -32,7 +32,7 @@ class AttributeController extends CatalogController
     public function getResourceByCode(string $code)
     {
         return response([
-            'data' => new AttributeResource($this->getRepositoryInstance()->with('options')->findOneByField('code', $code))
+            'data' => new AttributeResource($this->getRepositoryInstance()->with('options')->findOneByField('code', $code)),
         ]);
     }
 
@@ -44,7 +44,7 @@ class AttributeController extends CatalogController
     public function store()
     {
         $this->validate(request(), [
-            'code'          => ['required', 'not_in:type,attribute_family_id', 'unique:attributes,code', new Code()],
+            'code'          => ['required', 'not_in:type,attribute_family_id', 'unique:attributes,code', new Code],
             'admin_name'    => 'required',
             'type'          => 'required',
             'default_value' => 'integer',

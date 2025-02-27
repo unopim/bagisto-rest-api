@@ -237,8 +237,8 @@ return [
                     'update-success' => 'Coupon della regola del carrello aggiornato con successo.',
 
                     'mass-operations' => [
-                        'delete-success' => 'Coupon delle regole del carrello eliminati con successo'
-                    ]
+                        'delete-success' => 'Coupon delle regole del carrello eliminati con successo',
+                    ],
                 ],
             ],
 
@@ -477,7 +477,7 @@ return [
                     'success'        => 'Codice del coupon applicato con successo.',
                 ],
 
-                'move-wishlist' => [                    
+                'move-wishlist' => [
                     'success' => 'Articolo spostato nella lista dei desideri con successo.',
                 ],
             ],

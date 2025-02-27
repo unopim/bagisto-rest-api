@@ -85,9 +85,7 @@ class AttributeFamilyController
      *      )
      * )
      */
-    public function list()
-    {
-    }
+    public function list() {}
 
     /**
      * @OA\Get(
@@ -124,9 +122,7 @@ class AttributeFamilyController
      *      )
      * )
      */
-    public function get()
-    {
-    }
+    public function get() {}
 
     /**
      * @OA\Get(
@@ -163,9 +159,7 @@ class AttributeFamilyController
      *      )
      * )
      */
-    public function getByCode()
-    {
-    }
+    public function getByCode() {}
 
     /**
      * @OA\Post(
@@ -251,9 +245,7 @@ class AttributeFamilyController
      *      )
      * )
      */
-    public function store()
-    {
-    }
+    public function store() {}
 
     /**
      * @OA\Put(
@@ -308,14 +300,15 @@ class AttributeFamilyController
      *                          @OA\Property(
      *                              property="custom_attributes",
      *                              type="array",
+     *
      *                              @OA\Items(
      *                                  type="object",
+     *
      *                                  @OA\Property(property="id", type="integer", example=1),
      *                                  @OA\Property(property="position", type="integer", example=1)
      *                              )
      *                          )
      *                      ),
-     *
      *                      @OA\Property(
      *                          property="9",
      *                          type="object",
@@ -326,8 +319,10 @@ class AttributeFamilyController
      *                          @OA\Property(
      *                              property="custom_attributes",
      *                              type="array",
+     *
      *                              @OA\Items(
      *                                  type="object",
+     *
      *                                  @OA\Property(property="id", type="integer", example=9),
      *                                  @OA\Property(property="position", type="integer", example=1)
      *                              )
@@ -364,9 +359,7 @@ class AttributeFamilyController
      *      )
      * )
      */
-    public function update()
-    {
-    }
+    public function update() {}
 
     /**
      * @OA\Delete(
@@ -403,7 +396,5 @@ class AttributeFamilyController
      *      )
      * )
      */
-    public function destroy()
-    {
-    }
+    public function destroy() {}
 }

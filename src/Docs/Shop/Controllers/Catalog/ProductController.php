@@ -111,9 +111,7 @@ class ProductController
      *      )
      * )
      */
-    public function list()
-    {
-    }
+    public function list() {}
 
     /**
      * @OA\Get(
@@ -154,9 +152,7 @@ class ProductController
      *      )
      * )
      */
-    public function get()
-    {
-    }
+    public function get() {}
 
     /**
      * @OA\Get(
@@ -221,9 +217,7 @@ class ProductController
      *      )
      * )
      */
-    public function additionalInformation()
-    {
-    }
+    public function additionalInformation() {}
 
     /**
      * @OA\Get(
@@ -264,9 +258,7 @@ class ProductController
      *      )
      * )
      */
-    public function configurableConfig()
-    {
-    }
+    public function configurableConfig() {}
 
     /**
      * @OA\Post(
@@ -290,9 +282,12 @@ class ProductController
      *
      *      @OA\RequestBody(
      *          required=true,
+     *
      *          @OA\MediaType(
      *              mediaType="multipart/form-data",
+     *
      *              @OA\Schema(
+     *
      *                  @OA\Property(
      *                      property="title",
      *                      type="string"
@@ -308,12 +303,13 @@ class ProductController
      *                      example=4,
      *                      enum={"5", "4", "3", "2", "1"}
      *                  ),
-    *                  @OA\Property(
-    *                      property="attachments[]",
-    *                      type="array",
-    *                      @OA\Items(type="file"),
-    *                      description="Array of attachment files (images or videos)"
-    *                  ),
+     *                  @OA\Property(
+     *                      property="attachments[]",
+     *                      type="array",
+     *
+     *                      @OA\Items(type="file"),
+     *                      description="Array of attachment files (images or videos)"
+     *                  ),
      *                  required={"comment", "rating", "title"}
      *              )
      *          )
@@ -324,6 +320,7 @@ class ProductController
      *          description="Successful operation",
      *
      *          @OA\JsonContent(
+     *
      *              @OA\Property(
      *                  property="message",
      *                  type="string",
@@ -343,7 +340,5 @@ class ProductController
      *      )
      * )
      */
-    public function store()
-    {
-    }
+    public function store() {}
 }

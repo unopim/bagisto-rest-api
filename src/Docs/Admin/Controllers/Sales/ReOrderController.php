@@ -4,7 +4,7 @@ namespace Webkul\RestApi\Docs\Admin\Controllers\Sales;
 
 class ReOrderController
 {
-     /**
+    /**
      * @OA\Post(
      *      path="/api/v1/admin/sales/re-orders/{id}",
      *      operationId="createProductReOrder",
@@ -23,7 +23,7 @@ class ReOrderController
      *              type="integer"
      *          )
      *      ),
-     *     
+     *
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -45,9 +45,8 @@ class ReOrderController
      *      )
      * )
      */
-    public function store()
-    {
-    }
+    public function store() {}
+
     /**
      * @OA\Post(
      *      path="/api/v1/admin/sales/re-orders/{id}/save-address",
@@ -56,7 +55,7 @@ class ReOrderController
      *      summary="Save addresses at the checkout",
      *      description="Save addresses at the checkout",
      *      security={ {"sanctum_admin": {} }},
-     * 
+     *
      *      @OA\Parameter(
      *          name="id",
      *          description="cart id",
@@ -209,9 +208,7 @@ class ReOrderController
      *      )
      * )
      */
-    public function saveAddress()
-    {
-    }
+    public function saveAddress() {}
 
     /**
      * @OA\Post(
@@ -232,7 +229,7 @@ class ReOrderController
      *              type="integer"
      *          )
      *      ),
-     * 
+     *
      *      @OA\RequestBody(
      *
      *          @OA\MediaType(
@@ -282,9 +279,7 @@ class ReOrderController
      *      )
      * )
      */
-    public function saveShipping()
-    {
-    }
+    public function saveShipping() {}
 
     /**
      * @OA\Post(
@@ -305,7 +300,7 @@ class ReOrderController
      *              type="integer"
      *          )
      *      ),
-     * 
+     *
      *      @OA\RequestBody(
      *
      *          @OA\MediaType(
@@ -362,9 +357,7 @@ class ReOrderController
      *      )
      * )
      */
-    public function savePayment()
-    {
-    }
+    public function savePayment() {}
 
     /**
      * @OA\Post(
@@ -406,8 +399,5 @@ class ReOrderController
      *      )
      * )
      */
-
-    public function saveOrder()
-    {
-    }
+    public function saveOrder() {}
 }

@@ -101,9 +101,7 @@ class InvoiceController
      *      )
      * )
      */
-    public function list()
-    {
-    }
+    public function list() {}
 
     /**
      * @OA\Get(
@@ -140,9 +138,7 @@ class InvoiceController
      *      )
      * )
      */
-    public function get()
-    {
-    }
+    public function get() {}
 
     /**
      * @OA\Post(
@@ -230,7 +226,5 @@ class InvoiceController
      *      )
      * )
      */
-    public function store()
-    {
-    }
+    public function store() {}
 }
