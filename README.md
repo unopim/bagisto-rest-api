@@ -37,4 +37,15 @@ http://localhost/public/api/admin/documentation
 http://localhost/public/api/shop/documentation
 ~~~
 
+### 3. Using Bulk Product API with Queues
+
+To enable the **Bulk Product API** to run using queues, update your `.env` file:
+
+```sh
+QUEUE_DRIVER=database
+QUEUE_CONNECTION=database
+```
+
+This ensures that bulk operations are processed asynchronously using the queue system.
+
 * You can check the <a href="https://github.com/DarkaOnLine/L5-Swagger"> L5-Swagger </a> guidelines too regarding the configuration the API documentation.
