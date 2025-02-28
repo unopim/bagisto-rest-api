@@ -241,7 +241,7 @@ class Importer extends BaseImporter
         $this->productImageRepository->insert($productImages);
     }
 
-    protected function saveImageFromUrl(string $url, string $path, array $options = []): string
+    protected function saveImageFromUrl(string $url, string $path, array $options = []): string|null
     {
         $response = Http::withOptions(['verify' => false])->get($url);
 
