@@ -75,9 +75,7 @@ class AuthController
      *      )
      * )
      */
-    public function login()
-    {
-    }
+    public function login() {}
 
     /**
      * @OA\Post(
@@ -134,7 +132,5 @@ class AuthController
      *      )
      * )
      */
-    public function forgotPassword()
-    {
-    }
+    public function forgotPassword() {}
 }

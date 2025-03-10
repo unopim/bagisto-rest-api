@@ -183,6 +183,4 @@ namespace Webkul\RestApi\Docs\Admin\Controllers;
  *     description="API Endpoints of Product Reporting"
  * )
  */
-class Controller
-{
-}
+class Controller {}

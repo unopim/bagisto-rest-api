@@ -99,6 +99,4 @@ namespace Webkul\RestApi\Docs\Shop\Controllers;
  *     description="API Endpoints of Newsletters"
  * )
  */
-class Controller
-{
-}
+class Controller {}

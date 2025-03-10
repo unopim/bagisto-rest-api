@@ -90,9 +90,7 @@ class AddressController
      *      )
      * )
      */
-    public function list()
-    {
-    }
+    public function list() {}
 
     /**
      * @OA\Get(
@@ -134,9 +132,7 @@ class AddressController
      *      )
      * )
      */
-    public function get()
-    {
-    }
+    public function get() {}
 
     /**
      * @OA\Post(
@@ -148,9 +144,12 @@ class AddressController
      *      security={ {"sanctum": {} }},
      *
      *      @OA\RequestBody(
+     *
      *          @OA\MediaType(
      *              mediaType="application/json",
+     *
      *              @OA\Schema(
+     *
      *                  @OA\Property(
      *                      property="company_name",
      *                      type="string",
@@ -171,10 +170,12 @@ class AddressController
      *                      description="Street Address",
      *                      type="array",
      *                      example={"5230, N Lincoln Ave"},
+     *
      *                      @OA\Items(
      *                          type="string"
      *                      )
      *                  ),
+     *
      *                  @OA\Property(
      *                      property="country",
      *                      type="string",
@@ -220,7 +221,9 @@ class AddressController
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
+     *
      *          @OA\JsonContent(
+     *
      *              @OA\Property(
      *                  property="message",
      *                  type="string",
@@ -233,10 +236,13 @@ class AddressController
      *              )
      *          )
      *      ),
+     *
      *      @OA\Response(
      *          response=422,
      *          description="Error: Unprocessable Content",
+     *
      *          @OA\JsonContent(
+     *
      *              @OA\Examples(
      *                  example="result",
      *                  value={"message":"The first name field is required.","errors":{"first_name":{"The first name field is required."}}},
@@ -246,9 +252,7 @@ class AddressController
      *      )
      * )
      */
-    public function store()
-    {
-    }
+    public function store() {}
 
     /**
      * @OA\Put(
@@ -264,15 +268,19 @@ class AddressController
      *          description="Address id",
      *          required=true,
      *          in="path",
+     *
      *          @OA\Schema(
      *              type="integer"
      *          )
      *      ),
      *
      *      @OA\RequestBody(
+     *
      *          @OA\MediaType(
      *              mediaType="application/json",
+     *
      *              @OA\Schema(
+     *
      *                  @OA\Property(
      *                      property="company_name",
      *                      type="string",
@@ -293,10 +301,12 @@ class AddressController
      *                      description="Street Address",
      *                      type="array",
      *                      example={"5230, N Lincoln Ave"},
+     *
      *                      @OA\Items(
      *                          type="string"
      *                      )
      *                  ),
+     *
      *                  @OA\Property(
      *                      property="country",
      *                      type="string",
@@ -342,7 +352,9 @@ class AddressController
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
+     *
      *          @OA\JsonContent(
+     *
      *              @OA\Property(
      *                  property="message",
      *                  type="string",
@@ -355,10 +367,13 @@ class AddressController
      *              )
      *          )
      *      ),
+     *
      *      @OA\Response(
      *          response=422,
      *          description="Error: Unprocessable Content",
+     *
      *          @OA\JsonContent(
+     *
      *              @OA\Examples(
      *                  example="result",
      *                  value={"message":"The first name field is required.","errors":{"first_name":{"The first name field is required."}}},
@@ -368,10 +383,7 @@ class AddressController
      *      )
      * )
      */
-
-    public function update()
-    {
-    }
+    public function update() {}
 
     /**
      * @OA\Delete(
@@ -413,7 +425,5 @@ class AddressController
      *      )
      * )
      */
-    public function destroy()
-    {
-    }
+    public function destroy() {}
 }

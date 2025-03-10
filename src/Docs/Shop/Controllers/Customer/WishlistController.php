@@ -37,9 +37,7 @@ class WishlistController
      *      )
      * )
      */
-    public function get()
-    {
-    }
+    public function get() {}
 
     /**
      * @OA\Post(
@@ -129,9 +127,7 @@ class WishlistController
      *      )
      * )
      */
-    public function store()
-    {
-    }
+    public function store() {}
 
     /**
      * @OA\Post(
@@ -181,9 +177,7 @@ class WishlistController
      *      )
      * )
      */
-    public function moveToCart()
-    {
-    }
+    public function moveToCart() {}
 
     /**
      * @OA\Delete(
@@ -218,7 +212,5 @@ class WishlistController
      *      )
      * )
      */
-    public function deleteAll()
-    {
-    }
+    public function deleteAll() {}
 }

@@ -37,9 +37,7 @@ class CartController
      *      )
      * )
      */
-    public function get()
-    {
-    }
+    public function get() {}
 
     /**
      * @OA\Post(
@@ -206,9 +204,7 @@ class CartController
      *      )
      * )
      */
-    public function add()
-    {
-    }
+    public function add() {}
 
     /**
      * @OA\Put(
@@ -274,9 +270,7 @@ class CartController
      *      )
      * )
      */
-    public function update()
-    {
-    }
+    public function update() {}
 
     /**
      * @OA\Delete(
@@ -318,9 +312,7 @@ class CartController
      *      )
      * )
      */
-    public function removeItem()
-    {
-    }
+    public function removeItem() {}
 
     /**
      * @OA\Delete(
@@ -351,9 +343,7 @@ class CartController
      *      )
      * )
      */
-    public function remove()
-    {
-    }
+    public function remove() {}
 
     /**
      * @OA\Post(
@@ -395,9 +385,7 @@ class CartController
      *      )
      * )
      */
-    public function moveToWishlist()
-    {
-    }
+    public function moveToWishlist() {}
 
     /**
      * @OA\Post(
@@ -444,9 +432,7 @@ class CartController
      *      )
      * )
      */
-    public function applyCoupon()
-    {
-    }
+    public function applyCoupon() {}
 
     /**
      * @OA\Delete(
@@ -477,7 +463,5 @@ class CartController
      *      )
      * )
      */
-    public function removeCoupon()
-    {
-    }
+    public function removeCoupon() {}
 }

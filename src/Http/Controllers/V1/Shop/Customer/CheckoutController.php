@@ -2,8 +2,8 @@
 
 namespace Webkul\RestApi\Http\Controllers\V1\Shop\Customer;
 
-use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Webkul\Checkout\Facades\Cart;
 use Webkul\Payment\Facades\Payment;
 use Webkul\RestApi\Http\Resources\V1\Shop\Checkout\CartResource;
@@ -21,7 +21,7 @@ class CheckoutController extends CustomerController
      */
     public function saveAddress(CartAddressRequest $cartAddressRequest): Response
     {
-        $data =  $cartAddressRequest->all();
+        $data = $cartAddressRequest->all();
 
         if (
             Cart::hasError()
@@ -89,8 +89,8 @@ class CheckoutController extends CustomerController
         ]);
 
         if (
-            Cart::hasError() 
-            || ! $validatedData['payment'] 
+            Cart::hasError()
+            || ! $validatedData['payment']
             || ! Cart::savePaymentMethod($validatedData['payment'])
         ) {
             abort(400);

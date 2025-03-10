@@ -163,13 +163,14 @@ class Importer extends BaseImporter
 
                         continue;
                     }
-		        } else {
+                } else {
                     $imagePath = 'product'.DIRECTORY_SEPARATOR.$rowData['sku'];
                     if ($uploadedPath = $this->saveImageFromUrl($image, $imagePath)) {
                         $imagesData[$rowData['sku']][] = [
                             'name' => $uploadedPath,
                             'path' => Storage::path($uploadedPath),
                         ];
+
                         continue;
                     }
                 }
@@ -209,7 +210,7 @@ class Importer extends BaseImporter
                             'position'   => $key + 1,
                         ];
                     }
-		        } else if (Storage::has($image['name'])) {
+                } elseif (Storage::has($image['name'])) {
                     $productImages[] = [
                         'type'       => 'images',
                         'path'       => $image['name'],
@@ -240,7 +241,7 @@ class Importer extends BaseImporter
         $this->productImageRepository->insert($productImages);
     }
 
-    protected function saveImageFromUrl(string $url, string $path, array $options = []): string
+    protected function saveImageFromUrl(string $url, string $path, array $options = []): string|null
     {
         $response = Http::withOptions(['verify' => false])->get($url);
 
@@ -343,6 +344,27 @@ class Importer extends BaseImporter
                 'source' => $inventorySource,
                 'qty'    => $qty,
             ];
+        }
+    }
+
+    /**
+     * Prepare configurable variants
+     */
+    public function prepareConfigurableVariants(array $rowData, array &$configurableVariants): void
+    {
+        if (
+            $rowData['type'] != self::PRODUCT_TYPE_CONFIGURABLE
+            || empty($rowData['configurable_variants'])
+        ) {
+            return;
+        }
+
+        $variants = explode('|', $rowData['configurable_variants']);
+
+        foreach ($variants as $variant) {
+            parse_str(str_replace(',', '&', $variant), $variantAttributes);
+
+            $configurableVariants[$rowData['sku']][$variantAttributes['sku']] = Arr::except($variantAttributes, 'sku');
         }
     }
 

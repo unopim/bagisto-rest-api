@@ -89,9 +89,7 @@ class CategoryController
      *      )
      * )
      */
-    public function list()
-    {
-    }
+    public function list() {}
 
     /**
      * @OA\Get(
@@ -132,9 +130,7 @@ class CategoryController
      *      )
      * )
      */
-    public function get()
-    {
-    }
+    public function get() {}
 
     /**
      * @OA\Get(
@@ -175,7 +171,5 @@ class CategoryController
      *      )
      * )
      */
-    public function descendantCategories()
-    {
-    }
+    public function descendantCategories() {}
 }

@@ -237,8 +237,8 @@ return [
                     'update-success' => 'Coupon de règle de panier mis à jour avec succès.',
 
                     'mass-operations' => [
-                        'delete-success' => 'Les coupons de règle de panier ont été supprimés avec succès'
-                    ]
+                        'delete-success' => 'Les coupons de règle de panier ont été supprimés avec succès',
+                    ],
                 ],
             ],
 

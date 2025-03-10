@@ -96,9 +96,7 @@ class ProductController
      *      )
      * )
      */
-    public function list()
-    {
-    }
+    public function list() {}
 
     /**
      * @OA\Get(
@@ -139,9 +137,7 @@ class ProductController
      *      )
      * )
      */
-    public function get()
-    {
-    }
+    public function get() {}
 
     /**
      * @OA\Post(
@@ -230,9 +226,7 @@ class ProductController
      *      )
      * )
      */
-    public function store()
-    {
-    }
+    public function store() {}
 
     /**
      * @OA\Post(
@@ -563,9 +557,7 @@ class ProductController
      *      )
      * )
      */
-    public function update()
-    {
-    }
+    public function update() {}
 
     /**
      * @OA\Put(
@@ -782,13 +774,13 @@ class ProductController
      *
      *                      @OA\Items(type="integer", example=1)
      *                  ),
+     *
      *                  @OA\Property(
      *                      property="inventories",
      *                      description="Inventories",
      *                      type="object",
      *                      @OA\Property(property="1", description="Inventory source id", format="id", type="integer", example=270)
      *                  ),
-     *
      *                  @OA\Property(
      *                      property="variants",
      *                      description="Product's variants, `Only use in case of configurable type product (required field)`",
@@ -1057,9 +1049,7 @@ class ProductController
      *      )
      * )
      */
-    public function updateOtherTypeProduct()
-    {
-    }
+    public function updateOtherTypeProduct() {}
 
     /**
      * @OA\Post(
@@ -1124,9 +1114,7 @@ class ProductController
      *      )
      * )
      */
-    public function updateInventories()
-    {
-    }
+    public function updateInventories() {}
 
     /**
      * @OA\Delete(
@@ -1163,9 +1151,7 @@ class ProductController
      *      )
      * )
      */
-    public function destroy()
-    {
-    }
+    public function destroy() {}
 
     /**
      * @OA\Post(
@@ -1216,9 +1202,7 @@ class ProductController
      *      )
      * )
      */
-    public function massUpdate()
-    {
-    }
+    public function massUpdate() {}
 
     /**
      * @OA\Post(
@@ -1262,7 +1246,5 @@ class ProductController
      *      )
      * )
      */
-    public function massDestroy()
-    {
-    }
+    public function massDestroy() {}
 }
