@@ -134,13 +134,6 @@ class Importer extends BaseImporter
         }
 
         /**
-         * Skip the image upload if product is already created
-         */
-        if ($this->skuStorage->has($rowData['sku'])) {
-            return;
-        }
-
-        /**
          * Reset the sku images data to prevent
          * data duplication in case of multiple locales
          */
@@ -165,6 +158,11 @@ class Importer extends BaseImporter
                     }
                 } else {
                     $imagePath = 'product'.DIRECTORY_SEPARATOR.$rowData['sku'];
+                    $fullFilePath = $imagePath.'/'.basename($image);
+                    $productImage = $this->productImageRepository->where('path', $fullFilePath)->first();
+                    if ($productImage) {
+                        continue;
+                    }
                     if ($uploadedPath = $this->saveImageFromUrl($image, $imagePath)) {
                         $imagesData[$rowData['sku']][] = [
                             'name' => $uploadedPath,
@@ -262,7 +260,7 @@ class Importer extends BaseImporter
 
         $image = (new ImageManager)->make(file_get_contents($tempFilePath))->encode('webp');
 
-        $path = $path.'/'.Str::random(40).'.webp';
+        $path = $path.'/'.basename($url);
 
         try {
             if (Storage::put($path, $image)) {
