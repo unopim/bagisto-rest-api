@@ -98,7 +98,6 @@ class Importer extends BaseImporter
              * Prepare configurable variants
              */
             $this->prepareConfigurableVariants($rowData, $configurableVariants);
-
         }
 
         $this->saveProducts($products);
@@ -149,16 +148,44 @@ class Importer extends BaseImporter
                     $parsedUrl = ltrim($parsedUrl, '/');
 
                     if (Storage::disk('s3')->has($parsedUrl)) {
+                        $path = Storage::disk('s3')->path($parsedUrl);
+                        $productImage = $this->productImageRepository->where('path', $path)->first();
+                        if ($productImage) {
+                            continue;
+                        }
                         $imagesData[$rowData['sku']][] = [
                             'name' => $parsedUrl,
-                            'path' => Storage::disk('s3')->path($parsedUrl),
+                            'path' => $path,
+                        ];
+
+                        continue;
+                    }
+                } elseif (array_key_exists('azure', $disks) && $disks['azure']['key'] !== null) {
+                    $parsedUrl = parse_url($image, PHP_URL_PATH);
+                    $parsedUrl = ltrim($parsedUrl, '/');
+                    $container = config('filesystems.disks.azure.container');
+
+                    if (str_starts_with($parsedUrl, $container . '/')) {
+                        $parsedUrl = substr($parsedUrl, strlen($container) + 1);
+                    }
+
+                    if (Storage::disk('azure')->has($parsedUrl)) {
+                        $path = Storage::disk('azure')->path($parsedUrl);
+                        $productImage = $this->productImageRepository->where('path', $path)->first();
+                        if ($productImage) {
+                            continue;
+                        }
+
+                        $imagesData[$rowData['sku']][] = [
+                            'name' => $parsedUrl,
+                            'path' => $path,
                         ];
 
                         continue;
                     }
                 } else {
-                    $imagePath = 'product'.DIRECTORY_SEPARATOR.$rowData['sku'];
-                    $fullFilePath = $imagePath.'/'.basename($image);
+                    $imagePath = 'product' . DIRECTORY_SEPARATOR . $rowData['sku'];
+                    $fullFilePath = $imagePath . '/' . basename($image);
                     $productImage = $this->productImageRepository->where('path', $fullFilePath)->first();
                     if ($productImage) {
                         continue;
@@ -222,7 +249,7 @@ class Importer extends BaseImporter
 
                     $imageDirectory = $this->productImageRepository->getProductDirectory((object) $product);
 
-                    $path = $imageDirectory.'/'.Str::random(40).'.webp';
+                    $path = $imageDirectory . '/' . Str::random(40) . '.webp';
 
                     $productImages[] = [
                         'type'       => 'images',
@@ -253,14 +280,14 @@ class Importer extends BaseImporter
         try {
             file_put_contents($tempFilePath, $response->body());
         } catch (\Exception $e) {
-            Log::error("Unable to write temporary file for image URL: $url. Error: ".$e->getMessage());
+            Log::error("Unable to write temporary file for image URL: $url. Error: " . $e->getMessage());
 
             return null;
         }
 
         $image = (new ImageManager)->make(file_get_contents($tempFilePath))->encode('webp');
 
-        $path = $path.'/'.basename($url);
+        $path = $path . '/' . basename($url);
 
         try {
             if (Storage::put($path, $image)) {
@@ -271,7 +298,7 @@ class Importer extends BaseImporter
 
             return null;
         } catch (\Exception $e) {
-            Log::error("Failed to store image from URL: $url to path: $path. Error: ".$e->getMessage());
+            Log::error("Failed to store image from URL: $url to path: $path. Error: " . $e->getMessage());
 
             return null;
         }
