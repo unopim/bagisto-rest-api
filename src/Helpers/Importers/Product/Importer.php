@@ -98,7 +98,6 @@ class Importer extends BaseImporter
              * Prepare configurable variants
              */
             $this->prepareConfigurableVariants($rowData, $configurableVariants);
-
         }
 
         $this->saveProducts($products);
@@ -149,9 +148,37 @@ class Importer extends BaseImporter
                     $parsedUrl = ltrim($parsedUrl, '/');
 
                     if (Storage::disk('s3')->has($parsedUrl)) {
+                        $path = Storage::disk('s3')->path($parsedUrl);
+                        $productImage = $this->productImageRepository->where('path', $path)->first();
+                        if ($productImage) {
+                            continue;
+                        }
                         $imagesData[$rowData['sku']][] = [
                             'name' => $parsedUrl,
-                            'path' => Storage::disk('s3')->path($parsedUrl),
+                            'path' => $path,
+                        ];
+
+                        continue;
+                    }
+                } elseif (array_key_exists('azure', $disks) && $disks['azure']['key'] !== null) {
+                    $parsedUrl = parse_url($image, PHP_URL_PATH);
+                    $parsedUrl = ltrim($parsedUrl, '/');
+                    $container = config('filesystems.disks.azure.container');
+
+                    if (str_starts_with($parsedUrl, $container.'/')) {
+                        $parsedUrl = substr($parsedUrl, strlen($container) + 1);
+                    }
+
+                    if (Storage::disk('azure')->has($parsedUrl)) {
+                        $path = Storage::disk('azure')->path($parsedUrl);
+                        $productImage = $this->productImageRepository->where('path', $path)->first();
+                        if ($productImage) {
+                            continue;
+                        }
+
+                        $imagesData[$rowData['sku']][] = [
+                            'name' => $parsedUrl,
+                            'path' => $path,
                         ];
 
                         continue;
@@ -239,7 +266,7 @@ class Importer extends BaseImporter
         $this->productImageRepository->insert($productImages);
     }
 
-    protected function saveImageFromUrl(string $url, string $path, array $options = []): string|null
+    protected function saveImageFromUrl(string $url, string $path, array $options = []): ?string
     {
         $response = Http::withOptions(['verify' => false])->get($url);
 
