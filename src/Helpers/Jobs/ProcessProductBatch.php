@@ -36,4 +36,12 @@ class ProcessProductBatch implements ShouldQueue
         $importer->saveProductsData($this->batch);
         $importer->indexBatch($this->batch);
     }
+
+    /**
+     * Handle a job name.
+     */
+    public function viaQueue()
+    {
+        return 'bulk_product';
+    }
 }

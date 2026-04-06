@@ -48,12 +48,14 @@ class BulkProductController
             }
 
             if ($attribute->is_unique) {
-                $ruleSet[] = "unique:product_attribute_values,attribute_id,{$attribute->id}";
+                if ($attribute->code != 'url_key') {
+                    $ruleSet[] = "unique:product_attribute_values,attribute_id,{$attribute->id}";
+                }
             }
 
             switch ($this->attributeTypeFields[$attribute->type] ?? null) {
                 case 'text_value':
-                    $ruleSet[] = 'string';
+                    // $ruleSet[] = 'string';
                     break;
                 case 'float_value':
                     $ruleSet[] = 'numeric|min:0';

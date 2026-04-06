@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\ImageManager;
 use Webkul\DataTransfer\Helpers\Importers\Product\Importer as BaseImporter;
 use Webkul\Product\Jobs\ElasticSearch\UpdateCreateIndex as UpdateCreateElasticSearchIndexJob;
 use Webkul\Product\Jobs\UpdateCreateInventoryIndex as UpdateCreateInventoryIndexJob;
@@ -49,6 +48,10 @@ class Importer extends BaseImporter
         $links = [];
 
         foreach ($data as $rowData) {
+            /**
+             * change the product url key if already exist
+             */
+            $this->changeUrlKeyIfAlreadyExists($rowData, 1);
             /**
              * Prepare products for import
              */
@@ -125,6 +128,73 @@ class Importer extends BaseImporter
     }
 
     /**
+     * Change the url key if it already exists
+     */
+    public function changeUrlKeyIfAlreadyExists(array &$rowData, int $count, ?string $baseUrlKey = null): void
+    {
+        $baseUrlKey = $baseUrlKey ?? $rowData['url_key'];
+        
+        if (core()->getConfigData('catalog.products.search.engine') == 'elastic') {
+            $searchEngine = core()->getConfigData('catalog.products.search.storefront_mode');
+        }
+
+        $product = $this->productRepository
+            ->setSearchEngine($searchEngine ?? 'database')
+            ->findBySlug($rowData['url_key']);
+
+        if (! empty($product['sku']) && $product['sku'] == $rowData['sku']) {
+            return;
+        }
+
+        if ($product) {
+            $rowData['url_key'] = $baseUrlKey.'-'.$count;
+            $count++;
+            $this->changeUrlKeyIfAlreadyExists($rowData, $count, $baseUrlKey);
+        }
+    }
+
+    /**
+     * Save products from current batch
+     */
+    public function prepareAttributeValues(array $rowData, array &$attributeValues): void
+    {
+        $data = [];
+
+        $familyAttributes = $this->getProductTypeFamilyAttributes($rowData['type'], $rowData['attribute_family_code']);
+
+        foreach ($rowData as $attributeCode => $value) {
+            if (is_null($value)) {
+                continue;
+            }
+
+            $attribute = $familyAttributes->where('code', $attributeCode)->first();
+            
+            if (! $attribute) {
+                continue;
+            }
+            
+            if ($attribute->type == 'select' && $attribute->is_configurable == '1') {
+                // skip configurable attributes
+                $attributeOption = $this->attributeOptionRepository
+                    ->where('attribute_id', $attribute->id)
+                    ->where('admin_name', $value)
+                    ->first();
+
+                $value = $attributeOption?->id ?? $value;
+            }
+
+            $attributeTypeValues = array_fill_keys(array_values($attribute->attributeTypeFields), null);
+
+            $attributeValues[$rowData['sku']][] = array_merge($attributeTypeValues, [
+                'attribute_id'          => $attribute->id,
+                $attribute->column_name => $value,
+                'channel'               => $attribute->value_per_channel ? $rowData['channel'] : null,
+                'locale'                => $attribute->value_per_locale ? $rowData['locale'] : null,
+            ]);
+        }
+    }
+
+    /**
      * Prepare images from current batch
      */
     public function prepareImages(array $rowData, array &$imagesData): void
@@ -144,14 +214,42 @@ class Importer extends BaseImporter
 
         foreach ($imageNames as $key => $image) {
             if (filter_var($image, FILTER_VALIDATE_URL)) {
-                if (array_key_exists('s3', $disks) && $disks['s3']['key'] !== null) {
+                if (array_key_exists('s3', $disks) && !empty($disks['s3']['key'])) {
                     $parsedUrl = parse_url($image, PHP_URL_PATH);
                     $parsedUrl = ltrim($parsedUrl, '/');
 
                     if (Storage::disk('s3')->has($parsedUrl)) {
+                        $path = Storage::disk('s3')->path($parsedUrl);
+                        $productImage = $this->productImageRepository->where('path', $path)->first();
+                        if ($productImage) {
+                            continue;
+                        }
                         $imagesData[$rowData['sku']][] = [
                             'name' => $parsedUrl,
-                            'path' => Storage::disk('s3')->path($parsedUrl),
+                            'path' => $path,
+                        ];
+
+                        continue;
+                    }
+                } elseif (array_key_exists('azure', $disks) && !empty($disks['azure']['key'])) {
+                    $parsedUrl = parse_url($image, PHP_URL_PATH);
+                    $parsedUrl = ltrim($parsedUrl, '/');
+                    $container = config('filesystems.disks.azure.container');
+
+                    if (str_starts_with($parsedUrl, $container . '/')) {
+                        $parsedUrl = substr($parsedUrl, strlen($container) + 1);
+                    }
+
+                    if (Storage::disk('azure')->has($parsedUrl)) {
+                        $path = Storage::disk('azure')->path($parsedUrl);
+                        $productImage = $this->productImageRepository->where('path', $path)->first();
+                        if ($productImage) {
+                            continue;
+                        }
+
+                        $imagesData[$rowData['sku']][] = [
+                            'name' => $parsedUrl,
+                            'path' => $path,
                         ];
 
                         continue;
@@ -198,9 +296,17 @@ class Importer extends BaseImporter
             $product = $this->skuStorage->get($sku);
 
             foreach ($images as $key => $image) {
-
-                if (array_key_exists('s3', $disks) && $disks['s3']['key'] !== null) {
+                if (array_key_exists('s3', $disks) && !empty($disks['s3']['key'])) {
                     if (Storage::disk('s3')->has($image['name'])) {
+                        $productImages[] = [
+                            'type'       => 'images',
+                            'path'       => $image['name'],
+                            'product_id' => $product['id'],
+                            'position'   => $key + 1,
+                        ];
+                    }
+                } elseif (array_key_exists('azure', $disks) && !empty($disks['azure']['key'])) {
+                    if (Storage::disk('azure')->has($image['name'])) {
                         $productImages[] = [
                             'type'       => 'images',
                             'path'       => $image['name'],
@@ -218,7 +324,7 @@ class Importer extends BaseImporter
                 } else {
                     $file = new UploadedFile($image['path'], $image['name']);
 
-                    $image = (new ImageManager)->make($file)->encode('webp');
+                    $image = image_manager()->read($file)->encodeByExtension('webp');
 
                     $imageDirectory = $this->productImageRepository->getProductDirectory((object) $product);
 
@@ -239,7 +345,7 @@ class Importer extends BaseImporter
         $this->productImageRepository->insert($productImages);
     }
 
-    protected function saveImageFromUrl(string $url, string $path, array $options = []): string|null
+    protected function saveImageFromUrl(string $url, string $path, array $options = []): ?string
     {
         $response = Http::withOptions(['verify' => false])->get($url);
 
@@ -258,7 +364,7 @@ class Importer extends BaseImporter
             return null;
         }
 
-        $image = (new ImageManager)->make(file_get_contents($tempFilePath))->encode('webp');
+        $image = image_manager()->read(file_get_contents($tempFilePath))->encodeByExtension('webp');
 
         $path = $path.'/'.basename($url);
 
@@ -519,3 +625,4 @@ class Importer extends BaseImporter
         return true;
     }
 }
+
