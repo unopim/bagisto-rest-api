@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\ImageManager;
 use Webkul\DataTransfer\Helpers\Importers\Product\Importer as BaseImporter;
 use Webkul\Product\Jobs\ElasticSearch\UpdateCreateIndex as UpdateCreateElasticSearchIndexJob;
 use Webkul\Product\Jobs\UpdateCreateInventoryIndex as UpdateCreateInventoryIndexJob;
@@ -215,7 +214,7 @@ class Importer extends BaseImporter
 
         foreach ($imageNames as $key => $image) {
             if (filter_var($image, FILTER_VALIDATE_URL)) {
-                if (array_key_exists('s3', $disks) && $disks['s3']['key'] !== null) {
+                if (array_key_exists('s3', $disks) && !empty($disks['s3']['key'])) {
                     $parsedUrl = parse_url($image, PHP_URL_PATH);
                     $parsedUrl = ltrim($parsedUrl, '/');
 
@@ -232,7 +231,7 @@ class Importer extends BaseImporter
 
                         continue;
                     }
-                } elseif (array_key_exists('azure', $disks) && $disks['azure']['key'] !== null) {
+                } elseif (array_key_exists('azure', $disks) && !empty($disks['azure']['key'])) {
                     $parsedUrl = parse_url($image, PHP_URL_PATH);
                     $parsedUrl = ltrim($parsedUrl, '/');
                     $container = config('filesystems.disks.azure.container');
@@ -297,9 +296,17 @@ class Importer extends BaseImporter
             $product = $this->skuStorage->get($sku);
 
             foreach ($images as $key => $image) {
-
-                if (array_key_exists('s3', $disks) && $disks['s3']['key'] !== null) {
+                if (array_key_exists('s3', $disks) && !empty($disks['s3']['key'])) {
                     if (Storage::disk('s3')->has($image['name'])) {
+                        $productImages[] = [
+                            'type'       => 'images',
+                            'path'       => $image['name'],
+                            'product_id' => $product['id'],
+                            'position'   => $key + 1,
+                        ];
+                    }
+                } elseif (array_key_exists('azure', $disks) && !empty($disks['azure']['key'])) {
+                    if (Storage::disk('azure')->has($image['name'])) {
                         $productImages[] = [
                             'type'       => 'images',
                             'path'       => $image['name'],
@@ -317,7 +324,7 @@ class Importer extends BaseImporter
                 } else {
                     $file = new UploadedFile($image['path'], $image['name']);
 
-                    $image = (new ImageManager)->make($file)->encode('webp');
+                    $image = image_manager()->read($file)->encodeByExtension('webp');
 
                     $imageDirectory = $this->productImageRepository->getProductDirectory((object) $product);
 
@@ -338,7 +345,7 @@ class Importer extends BaseImporter
         $this->productImageRepository->insert($productImages);
     }
 
-    protected function saveImageFromUrl(string $url, string $path, array $options = []): string|null
+    protected function saveImageFromUrl(string $url, string $path, array $options = []): ?string
     {
         $response = Http::withOptions(['verify' => false])->get($url);
 
@@ -357,7 +364,7 @@ class Importer extends BaseImporter
             return null;
         }
 
-        $image = (new ImageManager)->make(file_get_contents($tempFilePath))->encode('webp');
+        $image = image_manager()->read(file_get_contents($tempFilePath))->encodeByExtension('webp');
 
         $path = $path.'/'.basename($url);
 
@@ -618,3 +625,4 @@ class Importer extends BaseImporter
         return true;
     }
 }
+
