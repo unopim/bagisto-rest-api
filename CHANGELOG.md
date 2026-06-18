@@ -2,6 +2,16 @@
 
 This changelog documents updates implemented in the forked repository: [Bagisto REST API](https://github.com/bagisto/rest-api).
 These updates have been applied to the forked REST API.
+## v1.0.5 (June 18, 2026) - Release
+
+#### Update
+- Compatibility with Bagisto 2.4.x and the UnoPim v2.1.x connector.
+
+#### Fixed
+- Exception handler method visibility changed from `private` to `protected` for compatibility with Bagisto 2.4.x.
+- Product image import: only use the S3 disk when AWS credentials are configured (an empty key no longer triggers the uninstalled S3 driver), and update image encoding to the Intervention Image v3 API.
+- Configurable variants: resolve variant SKUs from storage and skip missing ones so the bulk import no longer fails on an unresolved variant.
+
 ## v1.0.1 (January 30, 2025) - Release
 #### Improvements  
 - **Category Import**: Enhanced ID-based processing and implemented batch retry handling for more reliable imports.  
