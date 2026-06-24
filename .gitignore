@@ -1,1 +1,15 @@
 /vendor
+
+# Node / Playwright (tests/playwright)
+node_modules/
+tests/playwright/test-results/
+tests/playwright/playwright-report/
+tests/playwright/.cache/
+
+# Pest / PHPUnit
+.phpunit.result.cache
+.phpunit.cache/
+
+# Local env / editor
+.env
+.DS_Store

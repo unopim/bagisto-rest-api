@@ -1,0 +1,13 @@
+{
+  "name": "bagisto-rest-api-playwright",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright API tests for the Bagisto REST API package.",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}
