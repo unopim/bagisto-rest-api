@@ -2,7 +2,7 @@
 
 This changelog documents updates implemented in the forked repository: [Bagisto REST API](https://github.com/bagisto/rest-api).
 These updates have been applied to the forked REST API.
-## v1.0.2 (June 22, 2026) - Release
+## v1.0.2 (June 24, 2026) - Release
 
 #### Update
 - Compatibility with Bagisto 2.4.x and the UnoPim v2.1.x connector.
