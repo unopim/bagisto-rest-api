@@ -2,6 +2,13 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'המשאב לא נמצא.',
+                'empty-payload' => 'לא נשלחו מוצרים.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'ההזמנה בוטלה בהצלחה.',

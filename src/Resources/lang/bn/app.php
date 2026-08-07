@@ -2,6 +2,13 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'রিসোর্স পাওয়া যায়নি।',
+                'empty-payload' => 'কোনো পণ্য পাঠানো হয়নি।',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'অর্ডারটি সফলভাবে বাতিল হয়েছে।',

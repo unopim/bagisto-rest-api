@@ -2,6 +2,13 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'Bron niet gevonden.',
+                'empty-payload' => 'Er zijn geen producten verzonden.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'Bestelling succesvol geannuleerd.',

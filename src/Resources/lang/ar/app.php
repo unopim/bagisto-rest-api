@@ -2,6 +2,13 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'المورد غير موجود.',
+                'empty-payload' => 'لم يتم إرسال أي منتجات.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'تم إلغاء الطلب بنجاح.',

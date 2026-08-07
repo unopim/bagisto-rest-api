@@ -2,6 +2,13 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'Ressource nicht gefunden.',
+                'empty-payload' => 'Es wurden keine Produkte gesendet.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'Bestellung erfolgreich storniert.',

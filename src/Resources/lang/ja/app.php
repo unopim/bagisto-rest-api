@@ -2,6 +2,13 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'リソースが見つかりません。',
+                'empty-payload' => '商品が送信されませんでした。',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => '注文は正常にキャンセルされました。',

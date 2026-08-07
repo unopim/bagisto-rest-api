@@ -2,6 +2,13 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'සම්පත හමු නොවීය.',
+                'empty-payload' => 'නිෂ්පාදන කිසිවක් එවා නැත.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'ඇණවුම සාර්ථකයි ලබා ගත්තා.',

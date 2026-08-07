@@ -2,6 +2,13 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'منبع یافت نشد.',
+                'empty-payload' => 'هیچ محصولی ارسال نشد.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'سفارش با موفقیت لغو شد.',

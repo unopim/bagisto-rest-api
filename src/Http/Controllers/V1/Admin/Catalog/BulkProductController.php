@@ -86,9 +86,22 @@ class BulkProductController
         $errors = [];
         $validProducts = [];
         $data = $request->all();
+
+        if (empty($data)) {
+            return response()->json([
+                'message' => trans('rest-api::app.admin.common.error.empty-payload'),
+            ], 422);
+        }
+
         $validationRules = $this->getRule();
 
         foreach ($data as $index => $product) {
+            if (! is_array($product)) {
+                $errors["product_{$index}"] = [trans('rest-api::app.admin.common.error.empty-payload')];
+
+                continue;
+            }
+
             $validator = Validator::make($product, $validationRules);
 
             if ($validator->fails()) {
@@ -103,11 +116,16 @@ class BulkProductController
         }
 
         if (! empty($errors)) {
-            return response()->json(['errors' => $errors], 422);
+            return response()->json([
+                'errors'  => $errors,
+                'skipped' => array_keys($errors),
+                'queued'  => array_values(array_filter(array_column($validProducts, 'sku'))),
+            ], 422);
         }
 
         return response()->json([
             'message' => trans('rest-api::app.admin.catalog.products.create-success'),
+            'queued'  => array_values(array_filter(array_column($validProducts, 'sku'))),
         ]);
     }
 }
