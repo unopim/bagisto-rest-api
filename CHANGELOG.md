@@ -5,31 +5,55 @@ These updates have been applied to the forked REST API.
 
 ## v1.0.6 (August 10, 2026) - Release
 
-- Attribute & Family Lookup: Return `404` for an unknown code instead of a `500` fatal error.
-- Bulk Product Payloads: Reject an empty payload with `422` and report the `skipped` and `queued` SKUs.
-- Compatibility: Declared PHP `^8.3` and Laravel `^12.0`.
+#### Fixed
+- Attribute and attribute family lookup by code: return `404` for an unknown code instead of a `500` fatal error.
+- Bulk product creation: reject an empty payload with `422` and skip entries that are not objects.
+
+#### Improvements
+- **Bulk Product API**: Report the `skipped` and `queued` SKUs in both the success and validation responses.
+
+#### Update
+- Declared the supported platform: PHP `^8.3` and Laravel `^12.0`.
 
 ## v1.0.5 (June 24, 2026) - Release
 
-- Compatibility: Added support for Bagisto 2.4.x and the UnoPim Connector v2.1.x.
+#### Update
+- Compatibility with Bagisto 2.4.x and the UnoPim v2.1.x connector.
+
+#### Fixed
+- Exception handler method visibility changed from `private` to `protected` for compatibility with Bagisto 2.4.x.
+- Product image import: only use the S3 disk when AWS credentials are configured (an empty key no longer triggers the uninstalled S3 driver), and update image encoding to the Intervention Image v3 API.
+- Configurable variants: resolve variant SKUs from storage and skip missing ones so the bulk import no longer fails on an unresolved variant.
 
 ## v1.0.4 (March 10, 2025) - Release
 
-- Bulk Product API: Updated the endpoint and applied Laravel Pint code style.
+#### Improvements
+- **Bulk Product API**: Added a dynamic validator that enforces `required` and `unique` rules per attribute (driven by the attribute configuration) for bulk product creation.
+- **Configurable Variants**: Improved `prepareConfigurableVariants` parsing of variant data during bulk import.
+
+#### Update
+- Standardized code style across resources, routes, and language files with Laravel Pint.
 
 ## v1.0.3 (February 26, 2025) - Release
 
-- Attribute Families: Added the family default attribute on create and update.
+#### New Features
+- **Family Default Attributes**: Added default attribute handling for attribute families on create and update.
+- **Payload Resources**: Introduced payload resources for Attribute, Attribute Group, and Attribute Family responses.
 
 ## v1.0.2 (February 5, 2025) - Release
 
-- Lookup by Code: Added support for fetching an attribute and an attribute family by code.
+#### New Features
+- **Fetch by Code**: Added endpoints to fetch an attribute and an attribute family by their `code`.
+
+#### Improvements
+- **Product Import**: Trigger Elasticsearch, inventory, and price indexers after product creation so newly imported products are searchable immediately.
+- **Product Import**: Hardened image handling from URLs with error logging when a download or file write fails.
 
 ## v1.0.1 (January 30, 2025) - Release
-#### Improvements  
-- **Category Import**: Enhanced ID-based processing and implemented batch retry handling for more reliable imports.  
+#### Improvements
+- **Category Import**: Enhanced ID-based processing and implemented batch retry handling for more reliable imports.
 
-#### New Features  
+#### New Features
 - **S3 Compatibility**: Added support for both S3 protocol and S3 URLs within the same bucket to ensure seamless integration.
 
 ## v1.0.0 (January 20, 2025) - Release

@@ -117,11 +117,49 @@ class Importer extends BaseImporter
 
         $this->saveFlatData($flatData);
 
+        $this->resolveConfigurableVariants($configurableVariants);
+
         $this->saveConfigurableVariants($configurableVariants);
 
         $this->saveLinks($links);
 
         return true;
+    }
+
+    /**
+     * Load variant SKUs into storage and drop any variant that does not exist, so
+     * configurable linking resolves existing variants instead of failing on a
+     * missing one (e.g. when only the configurable parent is in the batch).
+     */
+    protected function resolveConfigurableVariants(array &$configurableVariants): void
+    {
+        if (empty($configurableVariants)) {
+            return;
+        }
+
+        $variantSkus = [];
+
+        foreach ($configurableVariants as $variants) {
+            $variantSkus = array_merge($variantSkus, array_keys($variants));
+        }
+
+        if (empty($variantSkus)) {
+            return;
+        }
+
+        $this->skuStorage->load($variantSkus);
+
+        foreach ($configurableVariants as $parentSku => $variants) {
+            foreach (array_keys($variants) as $variantSku) {
+                if (! $this->skuStorage->get($variantSku)) {
+                    unset($configurableVariants[$parentSku][$variantSku]);
+                }
+            }
+
+            if (empty($configurableVariants[$parentSku])) {
+                unset($configurableVariants[$parentSku]);
+            }
+        }
     }
 
     /**
@@ -144,7 +182,7 @@ class Importer extends BaseImporter
 
         foreach ($imageNames as $key => $image) {
             if (filter_var($image, FILTER_VALIDATE_URL)) {
-                if (array_key_exists('s3', $disks) && $disks['s3']['key'] !== null) {
+                if (array_key_exists('s3', $disks) && ! empty($disks['s3']['key'])) {
                     $parsedUrl = parse_url($image, PHP_URL_PATH);
                     $parsedUrl = ltrim($parsedUrl, '/');
 
@@ -199,7 +237,7 @@ class Importer extends BaseImporter
 
             foreach ($images as $key => $image) {
 
-                if (array_key_exists('s3', $disks) && $disks['s3']['key'] !== null) {
+                if (array_key_exists('s3', $disks) && ! empty($disks['s3']['key'])) {
                     if (Storage::disk('s3')->has($image['name'])) {
                         $productImages[] = [
                             'type'       => 'images',
@@ -218,7 +256,7 @@ class Importer extends BaseImporter
                 } else {
                     $file = new UploadedFile($image['path'], $image['name']);
 
-                    $image = (new ImageManager)->make($file)->encode('webp');
+                    $image = (string) ImageManager::gd()->read($file)->toWebp();
 
                     $imageDirectory = $this->productImageRepository->getProductDirectory((object) $product);
 
@@ -258,7 +296,7 @@ class Importer extends BaseImporter
             return null;
         }
 
-        $image = (new ImageManager)->make(file_get_contents($tempFilePath))->encode('webp');
+        $image = (string) ImageManager::gd()->read(file_get_contents($tempFilePath))->toWebp();
 
         $path = $path.'/'.basename($url);
 

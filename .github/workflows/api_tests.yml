@@ -1,0 +1,142 @@
+name: API Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:   # adds a "Run workflow" button in the Actions tab
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api_tests:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        php-versions: ['8.3']
+
+    name: REST API Tests | PHP ${{ matrix.php-versions }} · Bagisto 2.4.x
+
+    env:
+      BAGISTO_VERSION: '2.4'
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: bagisto
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    steps:
+      - name: Checkout REST API package
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Checkout Bagisto ${{ env.BAGISTO_VERSION }}
+        uses: actions/checkout@v4
+        with:
+          repository: bagisto/bagisto
+          ref: ${{ env.BAGISTO_VERSION }}
+          path: bagisto
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: bcmath, calendar, ctype, curl, dom, exif, fileinfo, gd, intl, mbstring, openssl, pdo, pdo_mysql, tokenizer, xml, zip
+          ini-values: error_reporting=E_ALL
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Bagisto composer dependencies
+        working-directory: bagisto
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Wire the package into Bagisto (path repository)
+        # AFTER composer install — otherwise the composer.lock replay drops the require.
+        working-directory: bagisto
+        run: |
+          composer config repositories.restapi path ../plugin
+          composer require unopim/bagisto-rest-api:@dev --no-interaction --no-progress
+
+      - name: Configure environment
+        working-directory: bagisto
+        run: |
+          cp .env.example .env
+          sed -i "s|^\(APP_ENV=\s*\).*$|\1testing|" .env
+          sed -i "s|^\(APP_DEBUG=\s*\).*$|\1true|" .env
+          sed -i "s|^\(APP_URL=\s*\).*$|\1http://127.0.0.1:8000|" .env
+          sed -i "s|^\(DB_HOST=\s*\).*$|\1127.0.0.1|" .env
+          sed -i "s|^\(DB_PORT=\s*\).*$|\1${{ job.services.mysql.ports['3306'] }}|" .env
+          sed -i "s|^\(DB_DATABASE=\s*\).*$|\1bagisto|" .env
+          sed -i "s|^\(DB_USERNAME=\s*\).*$|\1root|" .env
+          sed -i "s|^\(DB_PASSWORD=\s*\).*$|\1root|" .env
+          # No Redis service in CI — keep cache/session/queue local to the process.
+          grep -q '^CACHE_DRIVER=' .env && sed -i "s|^CACHE_DRIVER=.*|CACHE_DRIVER=array|" .env || echo "CACHE_DRIVER=array" >> .env
+          grep -q '^SESSION_DRIVER=' .env && sed -i "s|^SESSION_DRIVER=.*|SESSION_DRIVER=array|" .env || echo "SESSION_DRIVER=array" >> .env
+          grep -q '^QUEUE_CONNECTION=' .env && sed -i "s|^QUEUE_CONNECTION=.*|QUEUE_CONNECTION=sync|" .env || echo "QUEUE_CONNECTION=sync" >> .env
+          php artisan key:generate
+
+      - name: Run Bagisto installer (migrate + seed)
+        working-directory: bagisto
+        run: php artisan bagisto:install --skip-env-check --skip-admin-creation --skip-cloud-promotion
+
+      - name: Expose the package test namespace to the host autoloader
+        working-directory: bagisto
+        run: |
+          php -r '
+            $f = "composer.json";
+            $j = json_decode(file_get_contents($f), true);
+            $j["autoload-dev"]["psr-4"]["Webkul\\RestApi\\Tests\\"] = "vendor/unopim/bagisto-rest-api/tests/";
+            file_put_contents($f, json_encode($j, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+          '
+          composer dump-autoload --no-interaction
+
+      - name: Run Pest (REST API feature tests, in-process)
+        working-directory: bagisto
+        run: vendor/bin/pest vendor/unopim/bagisto-rest-api/tests/Feature --colors=always
+
+      - name: Start the server (for Playwright)
+        working-directory: bagisto
+        run: |
+          php artisan serve --host=0.0.0.0 --port=8000 > /tmp/server.log 2>&1 &
+          echo "Waiting for the REST API to come up..."
+          timeout 90 bash -c 'until curl -sf -H "Accept: application/json" http://127.0.0.1:8000/api/v1/attributes > /dev/null; do sleep 2; done' \
+            || (echo "::error::Server did not become ready"; cat /tmp/server.log; exit 1)
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright (no browsers needed for API tests)
+        working-directory: plugin/tests/playwright
+        run: npm install --no-progress --no-fund --no-audit
+
+      - name: Run Playwright (REST API tests, over HTTP)
+        working-directory: plugin/tests/playwright
+        env:
+          API_BASE_URL: http://127.0.0.1:8000
+          API_ADMIN_EMAIL: admin@example.com
+          API_ADMIN_PASSWORD: admin123
+        run: npx playwright test --reporter=list
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: plugin/tests/playwright/playwright-report
+
+      - name: Dump server log on failure
+        if: failure()
+        run: cat /tmp/server.log || true
