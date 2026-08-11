@@ -7,10 +7,10 @@ These updates have been applied to the forked REST API.
 
 #### Fixed
 - Attribute and attribute family lookup by code: return `404` for an unknown code instead of a `500` fatal error.
-- Bulk product creation: reject an empty payload with `422` and skip entries that are not objects.
+- Bulk product creation: reject an empty payload, and a body that is not a list of products, with `422` instead of reporting one error per field.
 
 #### Improvements
-- **Bulk Product API**: Report the `skipped` and `queued` SKUs in both the success and validation responses.
+- **Bulk Product API**: Report the `skipped` entries (the SKU where there is one, otherwise the position in the payload) and the `queued` SKUs in both the success and validation responses.
 
 #### Update
 - Declared the supported platform: PHP `^8.3` and Laravel `^12.0`.

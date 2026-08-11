@@ -93,11 +93,22 @@ class BulkProductController
             ], 422);
         }
 
+        /**
+         * The endpoint takes a JSON array of products. A single product object
+         * would otherwise be walked field by field, reporting one "product" per
+         * key, so reject anything that is not a list up front.
+         */
+        if (! array_is_list($data)) {
+            return response()->json([
+                'message' => trans('rest-api::app.admin.common.error.not-a-product-list'),
+            ], 422);
+        }
+
         $validationRules = $this->getRule();
 
         foreach ($data as $index => $product) {
             if (! is_array($product)) {
-                $errors["product_{$index}"] = [trans('rest-api::app.admin.common.error.empty-payload')];
+                $errors["product_{$index}"] = [trans('rest-api::app.admin.common.error.not-a-product-object')];
 
                 continue;
             }

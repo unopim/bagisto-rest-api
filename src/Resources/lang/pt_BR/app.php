@@ -6,6 +6,8 @@ return [
             'error' => [
                 'resource-not-found' => 'Recurso não encontrado.',
                 'empty-payload' => 'Nenhum produto foi enviado.',
+                'not-a-product-list' => 'O corpo da requisição deve ser uma lista de produtos.',
+                'not-a-product-object' => 'Esta entrada não é um objeto de produto.',
             ],
         ],
 

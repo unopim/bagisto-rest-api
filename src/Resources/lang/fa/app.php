@@ -6,6 +6,8 @@ return [
             'error' => [
                 'resource-not-found' => 'منبع یافت نشد.',
                 'empty-payload' => 'هیچ محصولی ارسال نشد.',
+                'not-a-product-list' => 'بدنه درخواست باید فهرستی از محصولات باشد.',
+                'not-a-product-object' => 'این ورودی یک شیء محصول نیست.',
             ],
         ],
 

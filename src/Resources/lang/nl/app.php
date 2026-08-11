@@ -6,6 +6,8 @@ return [
             'error' => [
                 'resource-not-found' => 'Bron niet gevonden.',
                 'empty-payload' => 'Er zijn geen producten verzonden.',
+                'not-a-product-list' => 'De aanvraagbody moet een lijst met producten zijn.',
+                'not-a-product-object' => 'Dit item is geen productobject.',
             ],
         ],
 

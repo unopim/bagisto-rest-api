@@ -6,6 +6,8 @@ return [
             'error' => [
                 'resource-not-found' => 'Ресурс не знайдено.',
                 'empty-payload' => 'Товари не було надіслано.',
+                'not-a-product-list' => 'Тіло запиту має бути списком товарів.',
+                'not-a-product-object' => 'Цей запис не є об\'єктом товару.',
             ],
         ],
 
