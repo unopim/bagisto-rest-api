@@ -2,6 +2,15 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'המשאב לא נמצא.',
+                'empty-payload' => 'לא נשלחו מוצרים.',
+                'not-a-product-list' => 'גוף הבקשה חייב להיות רשימה של מוצרים.',
+                'not-a-product-object' => 'רשומה זו אינה אובייקט מוצר.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'ההזמנה בוטלה בהצלחה.',

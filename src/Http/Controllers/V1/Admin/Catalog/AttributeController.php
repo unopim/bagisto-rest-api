@@ -31,8 +31,16 @@ class AttributeController extends CatalogController
      */
     public function getResourceByCode(string $code)
     {
+        $attribute = $this->getRepositoryInstance()->with('options')->findOneByField('code', $code);
+
+        if (! $attribute) {
+            return response([
+                'message' => trans('rest-api::app.admin.common.error.resource-not-found'),
+            ], 404);
+        }
+
         return response([
-            'data' => new AttributeResource($this->getRepositoryInstance()->with('options')->findOneByField('code', $code)),
+            'data' => new AttributeResource($attribute),
         ]);
     }
 

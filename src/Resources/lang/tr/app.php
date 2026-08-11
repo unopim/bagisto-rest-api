@@ -2,6 +2,15 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'Kaynak bulunamadı.',
+                'empty-payload' => 'Hiçbir ürün gönderilmedi.',
+                'not-a-product-list' => 'İstek gövdesi bir ürün listesi olmalıdır.',
+                'not-a-product-object' => 'Bu giriş bir ürün nesnesi değil.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'Sipariş başarıyla iptal edildi.',

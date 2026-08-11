@@ -2,6 +2,15 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'संसाधन नहीं मिला।',
+                'empty-payload' => 'कोई उत्पाद नहीं भेजा गया।',
+                'not-a-product-list' => 'अनुरोध का मुख्य भाग उत्पादों की सूची होना चाहिए।',
+                'not-a-product-object' => 'यह प्रविष्टि उत्पाद ऑब्जेक्ट नहीं है।',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'आदेश सफलतापूर्वक रद्द किया गया।',

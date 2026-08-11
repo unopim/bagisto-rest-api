@@ -33,8 +33,16 @@ class AttributeFamilyController extends CatalogController
      */
     public function getResourceByCode(string $code)
     {
+        $attributeFamily = $this->getRepositoryInstance()->findOneByField('code', $code);
+
+        if (! $attributeFamily) {
+            return response([
+                'message' => trans('rest-api::app.admin.common.error.resource-not-found'),
+            ], 404);
+        }
+
         return response([
-            'data' => new AttributeFamilyPayloadResource($this->getRepositoryInstance()->findOneByField('code', $code)),
+            'data' => new AttributeFamilyPayloadResource($attributeFamily),
         ]);
     }
 

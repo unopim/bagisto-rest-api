@@ -2,6 +2,15 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'Ресурс не найден.',
+                'empty-payload' => 'Товары не были отправлены.',
+                'not-a-product-list' => 'Тело запроса должно быть списком товаров.',
+                'not-a-product-object' => 'Эта запись не является объектом товара.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'Заказ успешно отменен.',

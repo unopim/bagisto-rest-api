@@ -2,6 +2,15 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'Risorsa non trovata.',
+                'empty-payload' => 'Nessun prodotto inviato.',
+                'not-a-product-list' => 'Il corpo della richiesta deve essere un elenco di prodotti.',
+                'not-a-product-object' => 'Questa voce non è un oggetto prodotto.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'Ordine annullato con successo.',

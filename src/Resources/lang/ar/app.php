@@ -2,6 +2,15 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'المورد غير موجود.',
+                'empty-payload' => 'لم يتم إرسال أي منتجات.',
+                'not-a-product-list' => 'يجب أن يكون محتوى الطلب قائمة من المنتجات.',
+                'not-a-product-object' => 'هذا العنصر ليس كائن منتج.',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'تم إلغاء الطلب بنجاح.',

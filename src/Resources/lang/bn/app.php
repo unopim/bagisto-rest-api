@@ -2,6 +2,15 @@
 
 return [
     'admin' => [
+        'common' => [
+            'error' => [
+                'resource-not-found' => 'রিসোর্স পাওয়া যায়নি।',
+                'empty-payload' => 'কোনো পণ্য পাঠানো হয়নি।',
+                'not-a-product-list' => 'অনুরোধের বডি অবশ্যই পণ্যের একটি তালিকা হতে হবে।',
+                'not-a-product-object' => 'এই এন্ট্রিটি একটি পণ্য অবজেক্ট নয়।',
+            ],
+        ],
+
         'sales' => [
             'orders' => [
                 'cancel-success' => 'অর্ডারটি সফলভাবে বাতিল হয়েছে।',
