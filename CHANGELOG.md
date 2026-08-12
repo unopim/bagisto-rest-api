@@ -3,25 +3,14 @@
 This changelog documents updates implemented in the forked repository: [Bagisto REST API](https://github.com/bagisto/rest-api).
 These updates have been applied to the forked REST API.
 
-## v1.0.7 (August 12, 2026) - Release
+## v1.0.6 (August 12, 2026) - Release
 
 #### Fixed
 - Bulk product creation: a batch where only some products failed returns `207` with the queued SKUs, instead of `422` implying nothing was accepted.
-
-#### Improvements
-- **Bulk Product API**: Report `queued` and `skipped` under a `data` key so a client can read them from the response.
-
-## v1.0.6 (August 10, 2026) - Release
-
-#### Fixed
 - Attribute and attribute family lookup by code: return `404` for an unknown code instead of a `500` fatal error.
 - Bulk product creation: reject an empty payload, and a body that is not a list of products, with `422` instead of reporting one error per field.
-
-#### Improvements
+- **Bulk Product API**: Report `queued` and `skipped` under a `data` key so a client can read them from the response.
 - **Bulk Product API**: Report the `skipped` entries (the SKU where there is one, otherwise the position in the payload) and the `queued` SKUs in both the success and validation responses.
-
-#### Update
-- Declared the supported platform: PHP `^8.3` and Laravel `^12.0`.
 
 ## v1.0.5 (June 24, 2026) - Release
 
