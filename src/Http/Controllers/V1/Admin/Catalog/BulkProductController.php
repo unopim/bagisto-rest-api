@@ -126,17 +126,28 @@ class BulkProductController
             ProcessProductBatch::dispatch($validProducts);
         }
 
+        $queued = array_values(array_filter(array_column($validProducts, 'sku')));
+
         if (! empty($errors)) {
             return response()->json([
+                'data'    => [
+                    'queued'  => $queued,
+                    'skipped' => array_keys($errors),
+                    'errors'  => $errors,
+                ],
                 'errors'  => $errors,
                 'skipped' => array_keys($errors),
-                'queued'  => array_values(array_filter(array_column($validProducts, 'sku'))),
-            ], 422);
+                'queued'  => $queued,
+            ], empty($validProducts) ? 422 : 207);
         }
 
         return response()->json([
             'message' => trans('rest-api::app.admin.catalog.products.create-success'),
-            'queued'  => array_values(array_filter(array_column($validProducts, 'sku'))),
+            'data'    => [
+                'queued'  => $queued,
+                'skipped' => [],
+            ],
+            'queued'  => $queued,
         ]);
     }
 }
