@@ -1,6 +1,7 @@
 {
     "name": "unopim/bagisto-rest-api",
     "license": "MIT",
+    "version": "1.0.7",
     "authors": [
         {
             "name": "Webkul",
