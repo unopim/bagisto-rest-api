@@ -196,7 +196,7 @@ class Importer extends BaseImporter
                     }
                 } else {
                     $imagePath = 'product'.DIRECTORY_SEPARATOR.$rowData['sku'];
-                    $fullFilePath = $imagePath.'/'.basename($image);
+                    $fullFilePath = $imagePath.'/'.$this->resolveImageFileName($image);
                     $productImage = $this->productImageRepository->where('path', $fullFilePath)->first();
                     if ($productImage) {
                         continue;
@@ -298,7 +298,7 @@ class Importer extends BaseImporter
 
         $image = (string) ImageManager::gd()->read(file_get_contents($tempFilePath))->toWebp();
 
-        $path = $path.'/'.basename($url);
+        $path = $path.'/'.$this->resolveImageFileName($url);
 
         try {
             if (Storage::put($path, $image)) {
@@ -313,6 +313,19 @@ class Importer extends BaseImporter
 
             return null;
         }
+    }
+
+    protected function resolveImageFileName(string $url): string
+    {
+        $name = basename(rawurldecode(parse_url($url, PHP_URL_PATH) ?: $url));
+
+        $extension = pathinfo($name, PATHINFO_EXTENSION);
+
+        $fileName = preg_replace('/[^\w.-]+/', '-', Str::ascii(pathinfo($name, PATHINFO_FILENAME)));
+
+        $fileName = trim($fileName, '-.') ?: 'image';
+
+        return $extension ? $fileName.'.'.$extension : $fileName;
     }
 
     /**

@@ -3,6 +3,12 @@
 This changelog documents updates implemented in the forked repository: [Bagisto REST API](https://github.com/bagisto/rest-api).
 These updates have been applied to the forked REST API.
 
+## v1.0.7 (Sept 16, 2026) - Release
+
+#### Fixed
+- Product image import: file names taken from an image URL are now sanitized before the file is stored — spaces and other unsafe characters are replaced with a hyphen, URL-encoded names are decoded, and any query string is dropped — so images whose name contains a space are saved and served correctly instead of producing a broken path.
+- Product image import: the duplicate check now looks up the same sanitized path that is written to storage, so re-importing a product no longer stores the image a second time.
+
 ## v1.0.6 (August 12, 2026) - Release
 
 #### Fixed
