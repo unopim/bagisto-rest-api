@@ -91,3 +91,7 @@ php artisan queue:work
 ```
 
 > See the [L5-Swagger](https://github.com/DarkaOnLine/L5-Swagger) documentation for more details on configuring the API documentation.
+
+## License
+
+The Bagisto REST API is open-source software licensed under the [MIT License](LICENSE).
